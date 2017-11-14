@@ -4,15 +4,15 @@
 #include "crypt.h"
 
 unsigned char flags[4] = {0};
-#define blockFlag flag[0]
+#define blockFlag flags[0]
+#define fileFlag flags[1]
+#define successFlag flags[2]
 
 int mainMenu();
 int processSettings();
 int settingsMenu();
 int doSettings();
 int prepareToDoCipher(int operate);
-
-
 
 int main(int argc, char** argv)
 {
@@ -30,7 +30,7 @@ int main(int argc, char** argv)
                 prepareToDoCipher(choice);
                 break;
             case 3:
-                int successFlag = doSettings();
+                successFlag = doSettings();
                 if (successFlag)
                 {
                     puts("Settings changed successfully!");
@@ -39,6 +39,7 @@ int main(int argc, char** argv)
                 {
                     puts("Invalid settings choice!");
                 }
+                successFlag = 0;
                 break;
             case 4:
                 puts("Bye");
@@ -78,7 +79,7 @@ int settingsMenu()
     puts("* 2. Simple block cipher         *");
     puts("* (TEA-style block cipher)       *");
     puts("**********************************");
-    printf("* Current algorithm: %d          *", blockFlag + 1);
+    printf("* Current algorithm: %d           *\n", blockFlag + 1);
     puts("**********************************");
     puts("Input your choice:");
     scanf("%d", &choice);
