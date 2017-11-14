@@ -3,13 +3,16 @@
 #include <string.h>
 #include "crypt.h"
 
-unsigned char flags[10] = {0};
-#define fileFlag flag[0]
-#define blockFlag flag[1]
-
+unsigned char flags[4] = {0};
+#define blockFlag flag[0]
 
 int mainMenu();
+int processSettings();
 int settingsMenu();
+int doSettings();
+int prepareToDoCipher(int operate);
+
+
 
 int main(int argc, char** argv)
 {
@@ -23,13 +26,19 @@ int main(int argc, char** argv)
         switch (choice)
         {
             case 1:
-                
-                break;
             case 2:
-
+                prepareToDoCipher(choice);
                 break;
             case 3:
-
+                int successFlag = doSettings();
+                if (successFlag)
+                {
+                    puts("Settings changed successfully!");
+                }
+                else
+                {
+                    puts("Invalid settings choice!");
+                }
                 break;
             case 4:
                 puts("Bye");
@@ -50,7 +59,7 @@ int mainMenu()
     puts("**********************************");
     puts("* 1. Encrypt text                *");
     puts("* 2. Decrypt text                *");
-    puts("* 3. Encrypt & decrypt settings  *");
+    puts("* 3. Cipher algorithm settings   *");
     puts("* 4. Exit                        *");
     puts("**********************************");
     puts("Input your choice:");
@@ -59,6 +68,40 @@ int mainMenu()
 }
 
 int settingsMenu()
+{
+    int choice = 0;
+    puts("**********************************");
+    puts("*       ALGORITHM SETTINGS       *");
+    puts("**********************************");
+    puts("* 1. Simple stream cipher        *");
+    puts("* (Vigenere-style XOR cipher)    *");
+    puts("* 2. Simple block cipher         *");
+    puts("* (TEA-style block cipher)       *");
+    puts("**********************************");
+    printf("* Current algorithm: %d          *", blockFlag + 1);
+    puts("**********************************");
+    puts("Input your choice:");
+    scanf("%d", &choice);
+    return choice;
+}
+
+int doSettings()
+{
+    int choice;
+    choice = settingsMenu();
+    switch (choice)
+    {
+        case 1:
+        case 2:
+            blockFlag = choice - 1;
+            return 1;
+        default:
+            return 0;
+    }
+    return 0;
+}
+
+int prepareToDoCipher(int operate)
 {
 
 }
