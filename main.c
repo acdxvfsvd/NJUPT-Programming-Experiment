@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "crypt.h"
+#include "acdio.h"
 
 char* iFilenamePtr = NULL;
 char* oFilenamePtr = NULL;
@@ -118,5 +119,29 @@ int prepareToDoCipher(int operate)
     puts("*  No more than 250 characters   *");
     puts("* Leave blank for keyboard input *");
     puts("**********************************");
-    
+    iFilenamePtr = (char *)malloc(0x100);
+    memset(iFilenamePtr, 0, 0x100);
+    if(readBuf(iFilenamePtr, 252) == 0)
+    {
+    	iFileFlag = 0;
+	}
+	else
+	{
+		iFileFlag = 1;
+	}
+	puts("**********************************");
+    puts("*   Input the target filename    *");
+    puts("*  No more than 250 characters   *");
+    puts("* Leave blank for screen output  *");
+    puts("**********************************");
+    oFilenamePtr = (char *)malloc(0x100);
+    memset(oFilenamePtr, 0, 0x100);
+    if(readBuf(oFilenamePtr, 252) == 0)
+    {
+    	oFileFlag = 0;
+	}
+	else
+	{
+		oFileFlag = 1;
+	}
 }
