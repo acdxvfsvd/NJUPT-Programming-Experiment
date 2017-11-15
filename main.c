@@ -3,10 +3,19 @@
 #include <string.h>
 #include "crypt.h"
 
+char* iFilenamePtr = NULL;
+char* oFilenamePtr = NULL;
+char* bufPtr = NULL;
+char* keyPtr = NULL;
+
+FILE* iFile = NULL;
+FILE* oFile = NULL;
+
 unsigned char flags[4] = {0};
 #define blockFlag flags[0]
-#define fileFlag flags[1]
-#define successFlag flags[2]
+#define iFileFlag flags[1]
+#define oFileFlag flags[2]
+#define successFlag flags[3]
 
 int mainMenu();
 int processSettings();
@@ -104,5 +113,10 @@ int doSettings()
 
 int prepareToDoCipher(int operate)
 {
-
+    puts("**********************************");
+    puts("*   Input the source filename    *");
+    puts("*  No more than 250 characters   *");
+    puts("* Leave blank for keyboard input *");
+    puts("**********************************");
+    
 }
