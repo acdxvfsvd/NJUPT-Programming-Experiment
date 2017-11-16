@@ -159,6 +159,19 @@ int prepareToDoCipher(int operate)
 		oFileFlag = 1;
     }
     puts("**********************************");
+    puts("*    Input the cryption key      *");
+    if (blockFlag)
+    {
+        puts("*     Must be 8 bytes long      *");
+        keyPtr = (char *)malloc(16);
+    }
+    else
+    {
+    puts("*   No more than 8 bytes long    *");
+    }
+    puts("**********************************");
+
+    puts("**********************************");
     if (!iFileFlag)
     {
         puts("*     Input the source text      *");
