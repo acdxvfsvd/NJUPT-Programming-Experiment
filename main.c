@@ -1,13 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "crypt.h"
-#include "acdio.h"
 
 char* iFilenamePtr = NULL;
 char* oFilenamePtr = NULL;
-char* bufPtr = NULL;
+char* srcPtr = NULL;
 char* keyPtr = NULL;
+char* destPtr = NULL;
 
 FILE* iFile = NULL;
 FILE* oFile = NULL;
@@ -17,12 +16,18 @@ unsigned char flags[4] = {0};
 #define iFileFlag flags[1]
 #define oFileFlag flags[2]
 #define successFlag flags[3]
+#define doEncrypt 0
+#define doDecrypt 1
+
+#include "crypt.h"
+#include "acdio.h"
 
 int mainMenu();
 int processSettings();
 int settingsMenu();
 int doSettings();
 int prepareToDoCipher(int operate);
+
 
 int main(int argc, char** argv)
 {
@@ -37,7 +42,16 @@ int main(int argc, char** argv)
         {
             case 1:
             case 2:
-                prepareToDoCipher(choice);
+                successFlag = prepareToDoCipher(choice);
+                if (successFlag)
+                {
+                    puts("Doing cipher successfully!");
+                }
+                else
+                {
+                    puts("Error!");
+                }
+                successFlag = 0;
                 break;
             case 3:
                 successFlag = doSettings();
@@ -74,7 +88,7 @@ int mainMenu()
     puts("* 4. Exit                        *");
     puts("**********************************");
     puts("Input your choice:");
-    scanf("%d", &choice);
+    choice = readNum();
     return choice;
 }
 
@@ -92,7 +106,7 @@ int settingsMenu()
     printf("* Current algorithm: %d           *\n", blockFlag + 1);
     puts("**********************************");
     puts("Input your choice:");
-    scanf("%d", &choice);
+    choice = readNum();
     return choice;
 }
 
@@ -143,5 +157,23 @@ int prepareToDoCipher(int operate)
 	else
 	{
 		oFileFlag = 1;
-	}
+    }
+    puts("**********************************");
+    if (!iFileFlag)
+    {
+        puts("*     Input the source text      *");
+        puts("*     Do not change the line     *");
+    }
+    else
+    {
+        puts("* Reading the text from file ... *");
+        iFile = fopen(iFilenamePtr, "r");
+        if (iFile == NULL)
+        {
+            puts("* Failed to open the input file! *");
+            puts("**********************************");
+            return 0;
+        }
+    }
+    puts("**********************************");
 }
