@@ -27,6 +27,7 @@ int processSettings();
 int settingsMenu();
 int doSettings();
 int prepareToDoCipher(int operate);
+int cipherIO(int operate);
 
 
 int main(int argc, char** argv)
@@ -99,7 +100,7 @@ int settingsMenu()
     puts("*       ALGORITHM SETTINGS       *");
     puts("**********************************");
     puts("* 1. Simple stream cipher        *");
-    puts("* (Vigenere-style XOR cipher)    *");
+    puts("* (Subkeys-generated XOR cipher) *");
     puts("* 2. Simple block cipher         *");
     puts("* (TEA-style block cipher)       *");
     puts("**********************************");
@@ -163,13 +164,18 @@ int prepareToDoCipher(int operate)
     if (blockFlag)
     {
         puts("*     Must be 8 bytes long      *");
-        keyPtr = (char *)malloc(16);
     }
     else
     {
-    puts("*   No more than 8 bytes long    *");
+        puts("*   No more than 8 bytes long    *");
     }
     puts("**********************************");
+    keyPtr = (char *)malloc(16);
+    memset(keyPtr, 0, 16);
+    do
+    {
+        continue;
+    } while(readBuf(keyPtr, 8));
 
     puts("**********************************");
     if (!iFileFlag)
