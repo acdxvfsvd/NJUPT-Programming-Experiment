@@ -21,8 +21,11 @@ int xorCipher(char* src, int length, unsigned char* dest, char* key, int keyLeng
 
 char* genSubkeys(char* key, int keyLength, int srcLength);
 
-int teaEncrypt(char* src, int length, unsigned char* temp, char* key);
-int teaDecrypt(char* src, int length, unsigned char* temp, char* key);
+int encodePKCS5Padding(unsigned char* buf, int length, int blockLength);
+int decodePKCS5Padding(unsigned char* buf, int length, int blockLength);
+
+int teaEncrypt(unsigned char* src, int length, unsigned char* dest, char* key);
+int teaDecrypt(unsigned char* src, int length, unsigned char* dest, char* key);
 
 
 

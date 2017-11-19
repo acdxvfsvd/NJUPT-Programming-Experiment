@@ -163,25 +163,22 @@ int prepareToDoCipher(int operate)
     puts("*    Input the cryption key      *");
     if (blockFlag)
     {
-        puts("*     Must be 8 bytes long      *");
+        puts("*     Must be 16 bytes long      *");
     }
     else
     {
-        puts("*   No more than 8 bytes long    *");
+        puts("*   No more than 16 bytes long    *");
     }
     puts("**********************************");
-    keyPtr = (char *)malloc(16);
-    memset(keyPtr, 0, 16);
-    do
-    {
-        continue;
-    } while(readBuf(keyPtr, 8));
+    keyPtr = (char *)malloc(24);
+    memset(keyPtr, 0, 24);
+    
 
     puts("**********************************");
     if (!iFileFlag)
     {
         puts("*     Input the source text      *");
-        puts("*     Do not change the line     *");
+        puts("*         Within one line        *");
     }
     else
     {

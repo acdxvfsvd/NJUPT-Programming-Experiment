@@ -133,14 +133,63 @@ char* genSubkeys(char* key, int keyLength, int srcLength)
     return res;
 }
 
-int teaEncrypt(char* src, int length, unsigned char* temp, char* key)
+int encodePKCS5Padding(unsigned char* buf, int length, int blockLength)
+{
+    int pad = 1;
+    int i;
+    while((pad + length) % blockLength != 0)
+    {
+        pad++;
+    }
+    for (i = 0; i < pad; i++)
+    {
+        buf[length + i] = pad;
+    }
+    return length + pad;
+}
+
+int decodePKCS5Padding(unsigned char* buf, int length, int blockLength)
+{
+    int i;
+    int pad = buf[length - 1];
+    for (i = 0; i < pad; i++)
+    {
+        buf[length - i] = 0;
+    }
+    return length - pad;
+}
+
+int teaEncrypt(unsigned char* src, int length, unsigned char* dest, char* key)
 {
     int result = 0;
-
+    int i = 0, j = 0;
+    length = encodePKCS5Padding(src, length, 8);
+    unsigned long* k = (unsigned long*)key;
+    unsigned long a = k[0], b = k[1], c = k[2], d = k[3];
+    unsigned long delta = 0x9E3779B9;
+    unsigned long* v = NULL;
+    unsigned long sum = 0;
+    unsigned long y, z;
+    for (i = 0; i < length; i += 8)
+    {
+        v = (unsigned long*)(src + i);
+        sum = 0;
+        y = v[0];
+        z = v[1];
+        for (j = 0; j < 48; j++)
+        {
+            sum += delta;
+            y += ((z<<4) + a) ^ (z + sum) ^ ((z>>5) + b);
+            z += ((y<<4) + c) ^ (y + sum) ^ ((y>>5) + d);
+        }
+        v[0] = y;
+        v[1] = z;
+    }
+    result = 1;
     return result;
 }
 
-int teaDecrypt(char* src, int length, unsigned char* temp, char* key)
+int teaDecrypt(unsigned char* src, int length, unsigned char* dest, char* key)
 {
     int result = 0;
 
