@@ -129,6 +129,7 @@ int doSettings()
 
 int prepareToDoCipher(int operate)
 {
+    int result = 0;
     puts("**********************************");
     puts("*   Input the source filename    *");
     puts("*  No more than 250 characters   *");
@@ -167,22 +168,24 @@ int prepareToDoCipher(int operate)
     }
     else
     {
-        puts("*   No more than 16 bytes long    *");
+        puts("*  No more than 16 bytes long    *");
     }
     puts("**********************************");
     keyPtr = (char *)malloc(24);
     memset(keyPtr, 0, 24);
-    
-
-    puts("**********************************");
-    if (!iFileFlag)
+    readBuf(keyPtr, 16);
+    if (blockFlag)
     {
-        puts("*     Input the source text      *");
-        puts("*         Within one line        *");
+        while(strlen(keyPtr) != 16)
+        {
+            puts("Length error!");
+            readBuf(keyPtr, 16);
+        }
     }
-    else
+    if (iFileFlag)
     {
-        puts("* Reading the text from file ... *");
+        puts("**********************************");
+        puts("*   Opening the input file ...   *");
         iFile = fopen(iFilenamePtr, "r");
         if (iFile == NULL)
         {
@@ -190,6 +193,71 @@ int prepareToDoCipher(int operate)
             puts("**********************************");
             return 0;
         }
+        puts("**********************************");
     }
+    if (oFileFlag)
+    {
+        puts("**********************************");
+        puts("*  Preparing the output file ... *");
+        oFile = fopen(oFilenamePtr, "w");
+        if (oFile == NULL)
+        {
+            puts("*Failed to open the output file! *");
+            puts("**********************************");
+            return 0;
+        }   
+        puts("**********************************");
+    }
+    result = cryptoIO(operate - 1);
+    fclose(iFile);
+    fclose(oFile);
+    iFile = NULL;
+    oFile = NULL;
+    free(keyPtr);
+    keyPtr = NULL;
+    return result;
+}
+
+int cryptoIO(int operate)
+{
+    int result = 0;
+    int bufLength, writeLength;
     puts("**********************************");
+    puts("*     Starting to do cipher      *");
+    puts("**********************************");
+    if (!iFileFlag)
+    {
+        puts("Input your text, within one line ...");
+        iFile = stdin;
+    }
+    srcPtr = (char *)malloc(48);
+    destPtr = (char *)malloc(48);
+    if (blockFlag)
+    {
+        bufLength = 8;
+        if (operate == doEncrypt)
+        {
+            writeLength = bufLength * 2;
+        }
+        else
+        {
+            writeLength = bufLength / 2;
+        }
+    }
+    else
+    {
+        if (operate == doEncrypt)
+        {
+            bufLength = strlen(keyPtr);
+            writeLength = bufLength * 2;
+        }
+        else
+        {
+            writeLength = strlen(keyPtr);
+            bufLength = writeLength * 2;
+        }
+    }
+    //fflush(iFile);
+    
+    return result;
 }

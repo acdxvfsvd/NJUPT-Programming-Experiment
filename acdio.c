@@ -1,5 +1,6 @@
 int readNum()
 {
+    fflush(stdin);
     char* buf = malloc(11);
     memset(buf, 0, 11);
     char ch;

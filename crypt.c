@@ -7,8 +7,8 @@ int doCipher(char* buf, int length, char* dest, int operate, char* key, int keyL
     {
         if (operate == 0)
         {
-            result = teaEncrypt(buf, length, temp, key);
-            if (result)
+            length = teaEncrypt(buf, length, temp, key);
+            if (length)
                 result = hexEncode(temp, length, dest);
             else 
             {
@@ -20,7 +20,7 @@ int doCipher(char* buf, int length, char* dest, int operate, char* key, int keyL
         {
             result = hexDecode(buf, length, temp);
             if (result)
-                result = teaDecrypt(temp, length / 2, buf, key);
+                length = teaDecrypt(temp, length / 2, buf, key);
             else
             {
                 free(temp);
@@ -54,7 +54,7 @@ int doCipher(char* buf, int length, char* dest, int operate, char* key, int keyL
         }
     }
     free(temp);
-    return result;
+    return length;
 }
 
 int hexEncode(unsigned char* src, int length, char* dest)
@@ -164,15 +164,17 @@ int teaEncrypt(unsigned char* src, int length, unsigned char* dest, char* key)
     int result = 0;
     int i = 0, j = 0;
     length = encodePKCS5Padding(src, length, 8);
+    printf("%s\n", src);
     unsigned long* k = (unsigned long*)key;
     unsigned long a = k[0], b = k[1], c = k[2], d = k[3];
     unsigned long delta = 0x9E3779B9;
-    unsigned long* v = NULL;
+    unsigned long* v = NULL, *u = NULL;
     unsigned long sum = 0;
     unsigned long y, z;
     for (i = 0; i < length; i += 8)
     {
         v = (unsigned long*)(src + i);
+        u = (unsigned long*)(dest + i);
         sum = 0;
         y = v[0];
         z = v[1];
@@ -182,16 +184,40 @@ int teaEncrypt(unsigned char* src, int length, unsigned char* dest, char* key)
             y += ((z<<4) + a) ^ (z + sum) ^ ((z>>5) + b);
             z += ((y<<4) + c) ^ (y + sum) ^ ((y>>5) + d);
         }
-        v[0] = y;
-        v[1] = z;
+        u[0] = y;
+        u[1] = z;
     }
     result = 1;
-    return result;
+    return length;
 }
 
 int teaDecrypt(unsigned char* src, int length, unsigned char* dest, char* key)
 {
     int result = 0;
-
-    return result;
+    int i = 0, j = 0;
+    unsigned long* k = (unsigned long*)key;
+    unsigned long a = k[0], b = k[1], c = k[2], d = k[3];
+    unsigned long delta = 0x9E3779B9;
+    unsigned long* v = NULL, *u = NULL;;
+    unsigned long sum = 0;
+    unsigned long y, z;
+    for (i = 0; i < length; i += 8)
+    {
+        v = (unsigned long*)(src + i);
+        u = (unsigned long*)(dest + i);
+        sum = 0xAA66D2B0;
+        y = v[0];
+        z = v[1];
+        for (j = 0; j < 48; j++)
+        {
+            z -= ((y<<4) + c) ^ (y + sum) ^ ((y>>5) + d);
+            y -= ((z<<4) + a) ^ (z + sum) ^ ((z>>5) + b);
+            sum -= delta;
+        }
+        u[0] = y;
+        u[1] = z;
+    }
+    length = decodePKCS5Padding(dest, length, 8);
+    result = 1;
+    return length;
 }
