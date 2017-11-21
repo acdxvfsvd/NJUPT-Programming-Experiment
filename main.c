@@ -145,6 +145,7 @@ int prepareToDoCipher(int operate)
 	{
 		iFileFlag = 1;
 	}
+	fflush(stdin);
 	puts("**********************************");
     puts("*   Input the target filename    *");
     puts("*  No more than 250 characters   *");
@@ -160,6 +161,7 @@ int prepareToDoCipher(int operate)
 	{
 		oFileFlag = 1;
     }
+    fflush(stdin);
     puts("**********************************");
     puts("*    Input the cryption key      *");
     if (blockFlag)
@@ -174,12 +176,14 @@ int prepareToDoCipher(int operate)
     keyPtr = (char *)malloc(24);
     memset(keyPtr, 0, 24);
     readBuf(keyPtr, 16);
+    fflush(stdin);
     if (blockFlag)
     {
         while(strlen(keyPtr) != 16)
         {
             puts("Length error!");
             readBuf(keyPtr, 16);
+            fflush(stdin);
         }
     }
     if (iFileFlag)
@@ -199,7 +203,7 @@ int prepareToDoCipher(int operate)
     {
         puts("**********************************");
         puts("*  Preparing the output file ... *");
-        oFile = fopen(oFilenamePtr, "w");
+        oFile = fopen(oFilenamePtr, "wb+");
         if (oFile == NULL)
         {
             puts("*Failed to open the output file! *");
@@ -209,8 +213,10 @@ int prepareToDoCipher(int operate)
         puts("**********************************");
     }
     result = cryptoIO(operate - 1);
-    fclose(iFile);
-    fclose(oFile);
+    if (iFile != stdin)
+        fclose(iFile);
+    if (oFile != stdout)
+        fclose(oFile);
     iFile = NULL;
     oFile = NULL;
     free(keyPtr);
@@ -221,6 +227,7 @@ int prepareToDoCipher(int operate)
 int cryptoIO(int operate)
 {
     int result = 0;
+    int len = 0;
     int bufLength, writeLength;
     puts("**********************************");
     puts("*     Starting to do cipher      *");
@@ -232,16 +239,19 @@ int cryptoIO(int operate)
     }
     srcPtr = (char *)malloc(48);
     destPtr = (char *)malloc(48);
+    memset(srcPtr, 0, sizeof(srcPtr));
+    memset(destPtr, 0, sizeof(destPtr));
     if (blockFlag)
     {
-        bufLength = 8;
         if (operate == doEncrypt)
         {
-            writeLength = bufLength * 2;
+        	bufLength = 8;
+            writeLength = 16;
         }
         else
         {
-            writeLength = bufLength / 2;
+        	bufLength = 16;
+            writeLength = 8;
         }
     }
     else
@@ -257,7 +267,28 @@ int cryptoIO(int operate)
             bufLength = writeLength * 2;
         }
     }
-    //fflush(iFile);
-    
+    fflush(iFile);
+    if (!oFileFlag)
+    {
+        oFile = stdout;
+    }
+    do
+    {
+    	if (iFileFlag)
+        	len = fread(srcPtr, 1, bufLength, iFile);
+        else
+        	len = readBuf(srcPtr, bufLength);
+        doCipher(srcPtr, len, destPtr, operate, keyPtr, strlen(keyPtr), blockFlag);
+        fwrite(destPtr, 1, writeLength, oFile);
+        memset(srcPtr, 0, sizeof(srcPtr));
+        memset(destPtr, 0, sizeof(destPtr));
+    } while (len == bufLength);
+    fflush(iFile);
+    printf("\n");
+    free(srcPtr);
+    free(destPtr);
+    srcPtr = NULL;
+    destPtr = NULL;
+    result = 1;
     return result;
 }

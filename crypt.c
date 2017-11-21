@@ -20,7 +20,7 @@ int doCipher(char* buf, int length, char* dest, int operate, char* key, int keyL
         {
             result = hexDecode(buf, length, temp);
             if (result)
-                length = teaDecrypt(temp, length / 2, buf, key);
+                length = teaDecrypt(temp, length / 2, dest, key);
             else
             {
                 free(temp);
@@ -163,8 +163,8 @@ int teaEncrypt(unsigned char* src, int length, unsigned char* dest, char* key)
 {
     int result = 0;
     int i = 0, j = 0;
-    length = encodePKCS5Padding(src, length, 8);
-    printf("%s\n", src);
+    if (length % 8 != 0)
+    	length = encodePKCS5Padding(src, length, 8);
     unsigned long* k = (unsigned long*)key;
     unsigned long a = k[0], b = k[1], c = k[2], d = k[3];
     unsigned long delta = 0x9E3779B9;
@@ -217,7 +217,8 @@ int teaDecrypt(unsigned char* src, int length, unsigned char* dest, char* key)
         u[0] = y;
         u[1] = z;
     }
-    length = decodePKCS5Padding(dest, length, 8);
+    if (dest[length - 1] < 8)
+    	length = decodePKCS5Padding(dest, length, 8);
     result = 1;
     return length;
 }

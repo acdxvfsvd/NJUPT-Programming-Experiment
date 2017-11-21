@@ -46,6 +46,5 @@ int readBuf(char* buf, int n)
         *(buf + i) = ch;
         i++;
     }
-    fflush(stdin);
     return i;
 }
