@@ -9,7 +9,7 @@ int doCipher(char* buf, int length, char* dest, int operate, char* key, int keyL
         {
             length = teaEncrypt(buf, length, temp, key);
             if (length)
-                result = hexEncode(temp, length, dest);
+                length = hexEncode(temp, length, dest);
             else 
             {
                 free(temp);
@@ -18,9 +18,9 @@ int doCipher(char* buf, int length, char* dest, int operate, char* key, int keyL
         }
         else
         {
-            result = hexDecode(buf, length, temp);
-            if (result)
-                length = teaDecrypt(temp, length / 2, dest, key);
+            length = hexDecode(buf, length, temp);
+            if (length)
+                length = teaDecrypt(temp, length, dest, key);
             else
             {
                 free(temp);
@@ -32,9 +32,9 @@ int doCipher(char* buf, int length, char* dest, int operate, char* key, int keyL
     {
         if (operate == 0)
         {
-            result = xorCipher(buf, length, temp, key, keyLength);
-            if (result)
-                result = hexEncode(temp, length, dest);
+            length = xorCipher(buf, length, temp, key, keyLength);
+            if (length)
+                length = hexEncode(temp, length, dest);
             else 
             {
                 free(temp);
@@ -43,9 +43,9 @@ int doCipher(char* buf, int length, char* dest, int operate, char* key, int keyL
         }
         else
         {
-            result = hexDecode(buf, length, temp);
-            if (result)
-                result = xorCipher(temp, length, dest, key, keyLength);
+            length = hexDecode(buf, length, temp);
+            if (length)
+                length = xorCipher(temp, length, dest, key, keyLength);
             else
             {
                 free(temp);
@@ -66,7 +66,7 @@ int hexEncode(unsigned char* src, int length, char* dest)
         i++;
     }
     result = 1;
-    return result;
+    return 2 * length;
 }
 
 int hexDecode(char* src, int length, unsigned char* dest)
@@ -84,7 +84,7 @@ int hexDecode(char* src, int length, unsigned char* dest)
         *(dest + i / 2) = ch;
     }
     result = 1;
-    return result;
+    return length / 2;
 }
 
 int hex2int(char hexch)
@@ -115,7 +115,7 @@ int xorCipher(char* src, int length, unsigned char* dest, char* key, int keyLeng
     }
     free(subkeys);
     result = 1;
-    return result;
+    return length;
 }
 
 

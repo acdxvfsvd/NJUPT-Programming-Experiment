@@ -246,12 +246,10 @@ int cryptoIO(int operate)
         if (operate == doEncrypt)
         {
         	bufLength = 8;
-            writeLength = 16;
         }
         else
         {
         	bufLength = 16;
-            writeLength = 8;
         }
     }
     else
@@ -259,12 +257,10 @@ int cryptoIO(int operate)
         if (operate == doEncrypt)
         {
             bufLength = strlen(keyPtr);
-            writeLength = bufLength * 2;
         }
         else
         {
-            writeLength = strlen(keyPtr);
-            bufLength = writeLength * 2;
+            bufLength = strlen(keyPtr) * 2;
         }
     }
     fflush(iFile);
@@ -278,7 +274,7 @@ int cryptoIO(int operate)
         	len = fread(srcPtr, 1, bufLength, iFile);
         else
         	len = readBuf(srcPtr, bufLength);
-        doCipher(srcPtr, len, destPtr, operate, keyPtr, strlen(keyPtr), blockFlag);
+        writeLength = doCipher(srcPtr, len, destPtr, operate, keyPtr, strlen(keyPtr), blockFlag);
         fwrite(destPtr, 1, writeLength, oFile);
         memset(srcPtr, 0, sizeof(srcPtr));
         memset(destPtr, 0, sizeof(destPtr));

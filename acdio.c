@@ -27,6 +27,7 @@ int readNum()
     }
     result = atoi(buf);
     free(buf);
+    fflush(stdin);
     return result;
 }
 
